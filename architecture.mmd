@@ -1,0 +1,57 @@
+flowchart TD
+    subgraph GCS["Google Cloud Storage"]
+        A[Raw CSVs<br/>gs://retail_raw/sales/]
+        A1[Raw CSVs<br/>gs://retail_raw/customers/]
+        A2[Raw CSVs<br/>gs://retail_raw/products/]
+    end
+
+    subgraph Dataflow["Apache Beam on Dataflow"]
+        B[ETL Pipeline<br/>Clean + Append Sales]
+    end
+
+    subgraph BQ_Staging["BigQuery - Staging"]
+        C1[analytics.stg_sales]
+        C2[analytics.stg_customers]
+        C3[analytics.stg_products]
+    end
+
+    subgraph BQ_Star["BigQuery - Star Schema"]
+        D1[dim_customers<br/>from stg_customers]
+        D2[dim_products<br/>from stg_products]
+        D3[fact_sales<br/>from stg_sales<br/>Partitioned by date<br/>Clustered by product_id]
+    end
+
+    subgraph Composer["Cloud Composer (Airflow)"]
+        E1[Orchestrate Dataflow Job]
+        E2[Run DDL/DML<br/>Refresh fact_sales]
+    end
+
+    subgraph Visualization["Looker Studio"]
+        F[Reports + Dashboards]
+    end
+
+    subgraph Controls["Governance & Cost Controls"]
+        G1[BigQuery Partitioning]
+        G2[Budget Alerts]
+    end
+
+    %% Flows
+    %% Sales flow (via DAG + Dataflow)
+    A --> B
+    B --> C1
+    C1 --> D3
+    Composer --> B
+    Composer --> D3
+
+    %% Customers + Products (direct staging → dims)
+    A1 --> C2
+    A2 --> C3
+    C2 --> D1
+    C3 --> D2
+
+    %% Reporting + governance
+    D1 --> F
+    D2 --> F
+    D3 --> F
+    D3 -.-> G1
+    G1 -.-> G2
