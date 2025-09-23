@@ -35,7 +35,6 @@ flowchart TD
         G2[Budget Alerts]
     end
 
-    %% Flows
     %% Sales flow (via DAG + Dataflow)
     A --> B
     B --> C1
@@ -55,3 +54,4 @@ flowchart TD
     D3 --> F
     D3 -.-> G1
     G1 -.-> G2
+    F -.-> G2
