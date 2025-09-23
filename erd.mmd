@@ -1,0 +1,23 @@
+erDiagram
+    FACT_SALES {
+        string sale_id
+        date date
+        float amount
+        string customer_id
+        string product_id
+    }
+
+    DIM_CUSTOMERS {
+        string customer_id
+        string customer_name
+        string region
+    }
+
+    DIM_PRODUCTS {
+        string product_id
+        string product_name
+        string category
+    }
+
+    FACT_SALES }o--|| DIM_CUSTOMERS : "customer_id"
+    FACT_SALES }o--|| DIM_PRODUCTS : "product_id"
