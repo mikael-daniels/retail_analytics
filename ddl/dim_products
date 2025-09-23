@@ -1,0 +1,16 @@
+CREATE TABLE
+  OR REPLACE TABLE analytics.dim_products (
+    product_id STRING,
+    product_name STRING,
+    category STRING
+  );
+
+
+INSERT INTO
+  analytics.dim_products
+SELECT
+  product_id,
+  product_name,
+  category
+FROM
+  analytics.products;
